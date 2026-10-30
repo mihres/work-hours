@@ -1025,16 +1025,59 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 
 // START APP
 
+
 async function startApp() {
   try {
+    // Load previously saved work records
+    const savedRecords = localStorage.getItem("workHoursRecords");
+
+    if (savedRecords) {
+      try {
+        records = JSON.parse(savedRecords);
+
+        if (!records || typeof records !== "object" ||
+            Array.isArray(records)) {
+          records = {};
+        }
+      } catch (error) {
+        console.error("Could not load saved records:", error);
+        records = {};
+        alert("There was a problem reading your saved records.");
+      }
+    }
+
+    // Open local photo database
     await openDatabase();
-    await navigator.storage?.persist?.();
+
+    // Request persistent browser storage
+    if (navigator.storage && navigator.storage.persist) {
+      const granted = await navigator.storage.persist();
+      console.log("Persistent storage granted:", granted);
+    }
+
+    // Restore selected accent colour
+    const savedAccent = localStorage.getItem("workHoursAccent");
+
+    if (savedAccent) {
+      $("accentSelect").value = savedAccent;
+      document.documentElement.style.setProperty(
+        "--accent",
+        savedAccent
+      );
+    }
+
+    // Render saved information
     renderDaily();
     renderWeekly();
     renderHistory();
+
+    saveStatus("Saved data loaded successfully");
+
   } catch (error) {
-    alert("Unable to open local photo storage. Please use a supported browser.");
+    console.error("App startup error:", error);
+    alert("Unable to load the app's saved data.");
   }
 }
 
 startApp();
+

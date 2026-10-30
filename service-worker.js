@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "work-hours-v1";
+const CACHE_NAME = "work-hours-v2";
 
 const APP_FILES = [
   "./",
