@@ -99,10 +99,35 @@ function saveStatus(message = "All changes saved locally") {
 
 function saveData() {
   try {
-    localStorage.setItem("workHoursRecords", JSON.stringify(records));
-    saveStatus();
+    const data = JSON.stringify(records);
+
+    localStorage.setItem("workHoursRecords", data);
+
+    // Verify that the saved data can be read back.
+    const saved = localStorage.getItem("workHoursRecords");
+
+    if (saved !== data) {
+      throw new Error("Saved data verification failed");
+    }
+
+    saveStatus("All changes saved locally");
+
+    console.log("Work records saved successfully.", {
+      origin: location.origin,
+      recordCount: Object.keys(records).length,
+      storageBytes: new Blob([data]).size
+    });
+
   } catch (error) {
-    saveStatus("Storage issue – please export a backup");
+    console.error("Failed to save work records:", error);
+
+    saveStatus("Storage error – check browser settings");
+
+    alert(
+      "Unable to save your work records. " +
+      "Please export a backup if possible.\n\n" +
+      error.message
+    );
   }
 }
 
