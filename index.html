@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111318">
+<meta name="description" content="A simple personal work hours and work diary.">
+<title>Work Hours</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div>
+      <h1>Work Hours<span class="accent-dot">.</span></h1>
+      <div class="subtitle">Your hours. Your work diary.</div>
+    </div>
+    <button class="settings-btn" id="settingsBtn" aria-label="Settings">⚙</button>
+  </header>
+
+  <div class="settings-panel hidden" id="settingsPanel">
+    <label for="accentSelect">Accent colour</label>
+    <select id="accentSelect">
+      <option value="#a78bfa">Purple</option>
+      <option value="#60a5fa">Blue</option>
+      <option value="#34d399">Green</option>
+      <option value="#f59e0b">Orange</option>
+      <option value="#fb7185">Pink</option>
+    </select>
+    <button class="secondary-btn" id="backupBtn">Backup all data</button>
+    <button class="secondary-btn" id="restoreBtn">Restore backup</button>
+    <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+    <button class="secondary-btn danger" id="resetBtn">Reset all app data</button>
+  </div>
+
+  <nav class="navigation">
+    <button class="nav-btn active" data-view="daily">Daily</button>
+    <button class="nav-btn" data-view="weekly">Weekly</button>
+    <button class="nav-btn" data-view="history">History</button>
+  </nav>
+
+  <main>
+
+    <!-- DAILY VIEW -->
+    <section id="dailyView" class="view">
+      <div class="date-navigation">
+        <button class="arrow-btn" id="prevDay">‹</button>
+        <div class="date-heading">
+          <div class="date-day" id="dailyDay"></div>
+          <div class="date-full" id="dailyDate"></div>
+        </div>
+        <button class="arrow-btn" id="nextDay">›</button>
+      </div>
+
+      <div class="section-heading">
+        <h2>Shifts</h2>
+        <span class="muted" id="shiftCount">0 shifts</span>
+      </div>
+
+      <div id="shiftList"></div>
+
+      <button class="add-btn" id="addShiftBtn">＋ Add an additional shift</button>
+
+      <div class="daily-total-card">
+        <div>
+          <div class="muted small">DAILY TOTAL</div>
+          <div class="big-total" id="dailyTotal">0 hr 0 min</div>
+        </div>
+        <button class="text-btn" id="manualBtn">Edit total</button>
+      </div>
+
+      <div id="manualPanel" class="manual-panel hidden">
+        <div class="section-heading">
+          <h3>Manual total</h3>
+          <button class="text-btn" id="autoTotalBtn">Use automatic</button>
+        </div>
+        <div class="manual-fields">
+          <div>
+            <label for="manualHours">Hours</label>
+            <input type="number" id="manualHours" min="0" max="999" value="0">
+          </div>
+          <div>
+            <label for="manualMinutes">Minutes</label>
+            <input type="number" id="manualMinutes" min="0" max="59" value="0">
+          </div>
+        </div>
+        <button class="primary-btn" id="saveManualBtn">Save manual total</button>
+      </div>
+
+      <div class="section-card">
+        <div class="section-heading">
+          <h2>Daily notes</h2>
+          <button class="text-btn" id="notesToggle">＋ Add notes</button>
+        </div>
+        <div id="notesPanel" class="hidden">
+          <textarea id="dailyNotes" rows="4"
+            placeholder="What did you work on today?"></textarea>
+          <div class="notes-actions">
+            <span class="muted small" id="notesStatus">Saved automatically</span>
+            <button class="text-btn danger-text" id="clearNotesBtn">Clear notes</button>
+          </div>
+        </div>
+        <div id="notesPreview" class="notes-preview muted">No notes added.</div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-heading">
+          <h2>Work photos</h2>
+          <span class="muted small" id="photoCount">0 photos</span>
+        </div>
+
+        <label class="camera-btn" for="cameraInput">
+          <span class="camera-icon">◎</span>
+          <span>
+            <strong>Take a photo</strong>
+            <small>Use your device camera</small>
+          </span>
+        </label>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+
+        <div id="photoGallery" class="photo-gallery"></div>
+        <p class="muted tiny">Photos are stored privately on this device.</p>
+      </div>
+    </section>
+
+    <!-- WEEKLY VIEW -->
+    <section id="weeklyView" class="view hidden">
+      <div class="date-navigation">
+        <button class="arrow-btn" id="prevWeek">‹</button>
+        <div class="date-heading">
+          <div class="date-day">Weekly overview</div>
+          <div class="date-full" id="weekRange"></div>
+        </div>
+        <button class="arrow-btn" id="nextWeek">›</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Day / Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="weeklyTable"></tbody>
+        </table>
+      </div>
+
+      <div class="weekly-summary">
+        <div class="muted small">TOTAL HOURS THIS WEEK</div>
+        <div class="big-total" id="weeklyTotal">0 hr 0 min</div>
+        <div class="weekly-note" id="weeklyStatement"></div>
+        <div class="action-row">
+          <button class="primary-btn" id="copyBtn">▢ Copy summary</button>
+          <button class="secondary-btn" id="csvBtn">↓ Export CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY VIEW -->
+    <section id="historyView" class="view hidden">
+      <div class="date-navigation">
+        <button class="arrow-btn" id="prevMonth">‹</button>
+        <div class="date-heading">
+          <div class="date-day">Your history</div>
+          <div class="date-full" id="monthLabel"></div>
+        </div>
+        <button class="arrow-btn" id="nextMonth">›</button>
+      </div>
+
+      <div class="history-stats">
+        <div>
+          <div class="muted small">MONTHLY HOURS</div>
+          <div class="big-total" id="monthlyTotal">0 hr 0 min</div>
+        </div>
+        <div>
+          <div class="muted small">DAYS WITH HOURS</div>
+          <div class="stat-number" id="monthlyDays">0</div>
+        </div>
+      </div>
+
+      <div class="section-heading">
+        <h2>Previous weeks</h2>
+        <span class="muted small">Select a week to view</span>
+      </div>
+      <div id="historyList"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span id="saveStatus">All changes saved locally</span>
+  </footer>
+
+</div>
+
+<!-- PHOTO VIEWER -->
+<div class="modal hidden" id="photoModal">
+  <button class="modal-close" id="closePhoto">×</button>
+  <img id="largePhoto" alt="Work photo">
+  <button class="secondary-btn danger" id="deletePhoto">Delete photo</button>
+</div>
+
+<!-- BACKUP FILE INPUT -->
+<script src="app.js"></script>
+</body>
+</html>
