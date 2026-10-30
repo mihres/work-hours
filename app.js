@@ -1074,11 +1074,40 @@ async function startApp() {
     // Open local photo database
     await openDatabase();
 
-    // Request persistent browser storage
-    if (navigator.storage && navigator.storage.persist) {
-      const granted = await navigator.storage.persist();
-      console.log("Persistent storage granted:", granted);
-    }
+    // Diagnose and request persistent storage.
+if (navigator.storage) {
+  try {
+    const alreadyPersistent =
+      await navigator.storage.persisted();
+
+    const persistent =
+      alreadyPersistent ||
+      (await navigator.storage.persist());
+
+    const estimate =
+      await navigator.storage.estimate();
+
+    console.log("Storage diagnostics:", {
+      origin: location.origin,
+      url: location.href,
+      standalone: window.matchMedia(
+        "(display-mode: standalone)"
+      ).matches,
+      persistent,
+      localStorageAvailable:
+        typeof localStorage !== "undefined",
+      savedRecords:
+        localStorage.getItem("workHoursRecords") !== null,
+      indexedDBAvailable:
+        typeof indexedDB !== "undefined",
+      storageUsage: estimate.usage,
+      storageQuota: estimate.quota
+    });
+
+  } catch (error) {
+    console.error("Storage diagnostics failed:", error);
+  }
+}
 
     // Restore selected accent colour
     const savedAccent = localStorage.getItem("workHoursAccent");
