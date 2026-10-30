@@ -1103,6 +1103,13 @@ if (navigator.storage) {
         typeof localStorage !== "undefined",
       savedRecords:
         localStorage.getItem("workHoursRecords") !== null,
+      alert(
+  "Storage check\n" +
+  "Origin: " + location.origin + "\n" +
+  "Saved records found: " + (savedRecords !== null) + "\n" +
+  "Saved data length: " + (savedRecords ? savedRecords.length : 0) + "\n" +
+  "Saved data preview: " + (savedRecords ? savedRecords.substring(0, 150) : "EMPTY")
+);
       console.log("WORK RECORDS AT STARTUP:", {
   origin: location.origin,
   url: location.href,
