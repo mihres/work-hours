@@ -1065,10 +1065,15 @@ async function startApp() {
           records = {};
         }
       } catch (error) {
-        console.error("Could not load saved records:", error);
-        records = {};
-        alert("There was a problem reading your saved records.");
-      }
+  console.error("Could not load saved records:", error);
+  alert(
+    "Could not read saved work records. " +
+    "Your existing saved data has not intentionally been overwritten. " +
+    "Please export or recover a backup before continuing."
+  );
+
+  throw error;
+}
     }
 
     // Open local photo database
@@ -1098,6 +1103,13 @@ if (navigator.storage) {
         typeof localStorage !== "undefined",
       savedRecords:
         localStorage.getItem("workHoursRecords") !== null,
+      console.log("WORK RECORDS AT STARTUP:", {
+  origin: location.origin,
+  url: location.href,
+  found: savedRecords !== null,
+  length: savedRecords ? savedRecords.length : 0,
+  preview: savedRecords ? savedRecords.slice(0, 200) : null
+});
       indexedDBAvailable:
         typeof indexedDB !== "undefined",
       storageUsage: estimate.usage,
