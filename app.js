@@ -56,8 +56,16 @@ function normalizeRecord(record) {
   };
 }
 function getRecord(key) {
-  if (!records[key]) records[key] = { shifts: [], manual: null, notes: "" };
-  else records[key] = normalizeRecord(records[key]);
+  // Keep existing record and shift objects stable so event handlers
+  // update the active data instead of outdated references.
+  if (!records[key]) {
+    records[key] = {
+      shifts: [],
+      manual: null,
+      notes: ""
+    };
+  }
+
   return records[key];
 }
 function formatMinutes(total) {
